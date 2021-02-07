@@ -88,22 +88,26 @@ garden_harvest %>%
 ```{r}
 garden_2 <- garden_harvest %>% 
   group_by(variety) %>% 
-  summarize(sumveg = sum(weight))
+  summarize(sumveg = sum(weight*0.00220462))
 
 left_join(garden_2, garden_planting)
 ```
 
 \
 
-There is some missing data in `garden_2` in the asparagus row and missing data in `garden_planting` in the strawberry row. There are also rows for varieties in each data frame that don't exist in the other, such as *greens* in `garden_planting`. Some data cleaning would have to be done to fix this, such as adding missing rows to each or just getting rid of all rows that have columns containing *NA*.
+There is some missing data in `garden_2` in the *asparagus* row and missing data in `garden_planting` in the *strawberry* row. There are also rows for varieties in each data frame that don't exist in the other, such as *greens* in `garden_planting`. Some data cleaning would have to be done to fix this, such as adding missing rows to each or just getting rid of all rows that have columns containing *NA*.
 
 
   3. I would like to understand how much money I "saved" by gardening, for each vegetable type. Describe how I could use the `garden_harvest` and `garden_spending` datasets, along with data from somewhere like [this](https://products.wholefoodsmarket.com/search?sort=relevance&store=10542) to answer this question. You can answer this in words, referencing various join functions. You don't need R code but could provide some if it's helpful.
+  
+First, we would need to find the yield of a seed packet by adding together the harvest weights for each vegetable type from. Then, we need to know how many seeds are in a packet from `garden_spending` (this data seems to be missing) to determine the cost of planting the number of seeds from `garden_planting`. This value will then be divided by the harvest weight for each vegetable seed and each harvested vegetable. A data frame of values containing columns such as `vegetable` and `cost_per_lb` could be constructed for the garden data and for Whole Foods and joined via a left join by `vegetable` in order to create visualizations to better compare costs.
 
   4. Subset the data to tomatoes. Reorder the tomato varieties from smallest to largest first harvest date. Create a barplot of total harvest in pounds for each variety, in the new order.
 
 ```{r}
-
+garden_harvest %>% 
+  filter(vegetable == "tomatoes") %>% 
+  
 ```
 
   5. In the `garden_harvest` data, create two new variables: one that makes the varieties lowercase and another that finds the length of the variety name. Arrange the data by vegetable and length of variety name (smallest to largest), with one row for each vegetable variety. HINT: use `str_to_lower()`, `str_length()`, and `distinct()`.
