@@ -245,27 +245,58 @@ I think this effect is better than the default because the curves are "stacked" 
   13. In this graph, go back to using the regular density plot (without `position = position_stack()`). Add a new variable to the dataset called `weekend` which will be "weekend" if the day is Saturday or Sunday and  "weekday" otherwise (HINT: use the `ifelse()` function and the `wday()` function from `lubridate`). Then, update the graph from the previous problem by faceting on the new `weekend` variable. 
   
 ```{r}
-
+Trips %>% 
+  mutate(day = wday(sdate, label = TRUE), 
+         time = hour(sdate) + minute(sdate)/60,
+         weekday = ifelse(day %in% c("Sat", "Sun"), "weekend", "weekday")) %>% 
+  ggplot(aes(x = time)) +
+  geom_density(aes(fill = client), alpha = 0.5) + 
+  facet_wrap(~weekday) +
+  labs(x = "Time of Day", y = "Density of Bike Rentals", fill = "Client")
 ```
   
   14. Change the graph from the previous problem to facet on `client` and fill with `weekday`. What information does this graph tell you that the previous didn't? Is one graph better than the other?
   
 ```{r}
-
+Trips %>% 
+  mutate(day = wday(sdate, label = TRUE), 
+         time = hour(sdate) + minute(sdate)/60,
+         weekday = ifelse(day %in% c("Sat", "Sun"), "weekend", "weekday")) %>% 
+  ggplot(aes(x = time)) +
+  geom_density(aes(fill = weekday), alpha = 0.5) + 
+  facet_wrap(~client) +
+  labs(x = "Time of Day", y = "Density of Bike Rentals", fill = "")
 ```
+  
+\  
+
+This graph looks *almost* the same as the previous graph. When comparing client types, it is potentially a bit easier to discern differences between times that casual vs. registered clients rent bikes. However, the information obtained does not change, it just changes where you need to look/which graph holds the information you're looking for.
   
 ### Spatial patterns
 
   15. Use the latitude and longitude variables in `Stations` to make a visualization of the total number of departures from each station in the `Trips` data. Use either color or size to show the variation in number of departures. We will improve this plot next week when we learn about maps!
   
 ```{r}
-
+ggplot(Stations, aes(x = long, y = lat)) +
+  geom_point(aes(color = nbEmptyDocks), alpha = 0.5) +
+  labs(x = "Longitude", y = "Latitude", color = "Number of Departures")
 ```
   
   16. Only 14.4% of the trips in our data are carried out by casual users. Create a plot that shows which area(s) have stations with a much higher percentage of departures by casual users. What patterns do you notice? (Again, we'll improve this next week when we learn about maps).
   
 ```{r}
-
+trips_new <- Trips %>%
+  group_by(sstation, client) %>% 
+  count(client) %>% 
+  pivot_wider(names_from = client, values_from = n) %>% 
+  mutate(perccasual = Casual/(Casual + Registered)*100, name = sstation) %>% 
+  select(-sstation)
+  
+right_join(trips_new, Stations) %>% 
+  na.omit %>% 
+  ggplot(aes(x = long, y = lat)) +
+  geom_point(aes(color = perccasual)) +
+  labs(x = "Longitude", y = "Latitude", color = "Percent Casual Riders")
 ```
   
 ### Spatiotemporal patterns
@@ -273,7 +304,8 @@ I think this effect is better than the default because the curves are "stacked" 
   17. Make a table with the ten station-date combinations (e.g., 14th & V St., 2014-10-14) with the highest number of departures, sorted from most departures to fewest. Save this to a new dataset and print out the dataset. Hint: `as_date(sdate)` converts `sdate` from date-time format to date format. 
   
 ```{r}
-
+trips_new2 <- Trips %>% 
+  
 ```
   
   18. Use a join operation to make a table with only those trips whose departures match those top ten station-date combinations from the previous part.
