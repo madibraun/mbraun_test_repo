@@ -427,7 +427,7 @@ We can see that casual clients were more likely to rent bikes on Saturdays (prop
 
   20. Below, provide a link to your GitHub page with this set of Weekly Exercises. Specifically, if the name of the file is 03_exercises.Rmd, provide a link to the 03_exercises.md file, which is the one that will be most readable on GitHub.
   
-[Link to 03_exercises.md](https://github.com/madibraun/mbraun_test_repo/blob/main/03_exercises.Rmd)
+[Link to 03_exercises.md](https://github.com/madibraun/mbraun_test_repo/blob/main/03_exercises.md)
 
 ## Challenge problem! 
 
