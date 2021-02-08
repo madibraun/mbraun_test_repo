@@ -158,7 +158,7 @@ Here is the code to read in the data. We do this a little differently than usual
 
 ```{r cache=TRUE}
 data_site <- 
-  "https://www.macalester.edu/~dshuman1/data/112/2014-Q4-Trips-History-Data-Small.rds" 
+  "https://www.macalester.edu/~dshuman1/data/112/2014-Q4-Trips-History-Data.rds" 
 Trips <- readRDS(gzcon(url(data_site)))
 Stations<-read_csv("http://www.macalester.edu/~dshuman1/data/112/DC-Stations.csv")
 ```
@@ -295,7 +295,7 @@ trips_new <- Trips %>%
 right_join(trips_new, Stations) %>% 
   na.omit %>% 
   ggplot(aes(x = long, y = lat)) +
-  geom_point(aes(color = perccasual)) +
+  geom_point(aes(color = perccasual), alpha = 0.5) +
   labs(x = "Longitude", y = "Latitude", color = "Percent Casual Riders")
 ```
   
@@ -335,7 +335,7 @@ left_join(trips_new2, Trips_date) %>%
   
 ```
 
-Notably, there is no Tuesday row present under the variable `day`. This is most likely due to the fact that the top ten days with the most departures were never on a Tuesday. However, we can see that casual bikers most often rented bikes on Saturdays, with a proportion of 0.45, while registered bikers most often rented bikes on Wednesdays and Thursdays with proportions of 0.33 and 0.31, respectively.
+We can see that casual clients were more likely to rent bikes on Saturdays (proportion of 0.56), of the departures in our largest departures dataset. Additionally, registered clients were more likely to rent bikes on Thursdays (proportion of 0.34). Some assumptions could be made to explain this discrepancy, such as casual bikers renting on weekends as an activity, while registered bikers incorporate renting bikes into their general routine/lifestyle. Additionally, there is no row for Fridays, most likely because the most departures never occurred on a Friday.
 
 **DID YOU REMEMBER TO GO BACK AND CHANGE THIS SET OF EXERCISES TO THE LARGER DATASET? IF NOT, DO THAT NOW.**
 
