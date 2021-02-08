@@ -12,7 +12,7 @@ output:
 
 
 ```{r setup, include=FALSE}
-#knitr::opts_chunk$set(echo = TRUE, error=TRUE, message=FALSE, warning=FALSE)
+knitr::opts_chunk$set(echo = TRUE, error=TRUE, message=FALSE, warning=FALSE)
 ```
 
 ```{r libraries}
@@ -36,6 +36,8 @@ data("garden_planting")
 
 # Tidy Tuesday data
 kids <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-15/kids.csv')
+
+kids$state <- state.abb[match(kids$state, state.name)] # converting state names to abbreviations
 ```
 
 ## Setting up on GitHub!
@@ -80,7 +82,8 @@ garden_harvest %>%
   mutate(day = wday(date)) %>% 
   group_by(vegetable, day) %>% 
   summarize(sumveg = sum(weight)) %>% 
-  pivot_wider(id_cols = vegetable, names_from = day, values_from = sumveg)
+  pivot_wider(id_cols = vegetable, names_from = day, values_from = sumveg) %>% 
+  replace(is.na(.), 0)
 ```
 
   2. Summarize the `garden_harvest` data to find the total harvest in pound for each vegetable variety and then try adding the plot from the `garden_planting` table. This will not turn out perfectly. What is the problem? How might you fix it?
@@ -351,6 +354,41 @@ This problem uses the data from the Tidy Tuesday competition this week, `kids`. 
 
   21. In this exercise, you are going to try to replicate the graph below, created by Georgios Karamanis. I'm sure you can find the exact code on GitHub somewhere, but **DON'T DO THAT!** You will only be graded for putting an effort into this problem. So, give it a try and see how far you can get without doing too much googling. HINT: use `facet_geo()`. The graphic won't load below since it came from a location on my computer. So, you'll have to reference the original html on the moodle page to see it.
   
-![](kids_data_karamanis.jpeg)
+
+
+```{r}
+kids_lib <- kids %>% 
+  na.omit() %>% 
+  filter(variable == "lib") %>% 
+  group_by(state, year) %>% 
+  summarize(lib_perchild = sum(inf_adj_perchild)) %>% 
+  filter(year %in% c(1997, 2016)) %>% 
+  mutate(thous_perchild = round(lib_perchild*1000, digits = 0)) %>% 
+  summarize(state, year, thous_perchild, diff_perchild = diff(thous_perchild)) %>% 
+  filter(year == 1997) %>% 
+  mutate(add_diff = thous_perchild + diff_perchild)
+
+ggplot(kids_lib, aes(x = year, y = thous_perchild)) +
+  geom_segment(aes(xend = year + 19, yend = thous_perchild + diff_perchild), 
+               arrow = arrow(length = unit(0.3, "cm")), color = "white") +
+  geom_point(color = "white") +
+  facet_geo(~state) + 
+  theme(plot.background = element_rect(fill = "azure3"),
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        panel.border = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(), 
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+  labs(x = "", y = "", 
+       title = "Change in public spending on libraries from 1997 to 2016", 
+       subtitle = "Thousands of dollars spent per child, adjusted for inflation") + 
+  geom_text(label = kids_lib$thous_perchild, size = 2, hjust = 0.1, vjust = 0.1) +
+  geom_text(label = kids_lib$add_diff, size = 2, hjust = -2.5, vjust = -1)
+```
+
 
 **DID YOU REMEMBER TO UNCOMMENT THE OPTIONS AT THE TOP?**
