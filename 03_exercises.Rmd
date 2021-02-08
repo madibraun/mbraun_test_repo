@@ -202,7 +202,14 @@ Trips %>%
   10. Facet your graph from exercise 8. by day of the week. Is there a pattern?
   
 ```{r}
-
+Trips %>% 
+  mutate(day = wday(sdate, label = TRUE), 
+         time = hour(sdate) + minute(sdate)/60) %>% 
+  ggplot(aes(x = time)) +
+  geom_density(aes(fill = day), alpha = 0.5) + 
+  theme(legend.position = "none") +
+  facet_wrap(~day) +
+  labs(x = "Time of Day", y = "Density of Bike Rentals")
 ```
   
 The variable `client` describes whether the renter is a regular user (level `Registered`) or has not joined the bike-rental organization (`Causal`). The next set of exercises investigate whether these two different categories of users show different rental behavior and how `client` interacts with the patterns you found in the previous exercises. 
@@ -210,14 +217,30 @@ The variable `client` describes whether the renter is a regular user (level `Reg
   11. Change the graph from exercise 10 to set the `fill` aesthetic for `geom_density()` to the `client` variable. You should also set `alpha = .5` for transparency and `color=NA` to suppress the outline of the density function.
   
 ```{r}
-
+Trips %>% 
+  mutate(day = wday(sdate, label = TRUE), 
+         time = hour(sdate) + minute(sdate)/60) %>% 
+  ggplot(aes(x = time)) +
+  geom_density(aes(fill = client), alpha = 0.5) + 
+  facet_wrap(~day) +
+  labs(x = "Time of Day", y = "Density of Bike Rentals", fill = "Client")
 ```
 
   12. Change the previous graph by adding the argument `position = position_stack()` to `geom_density()`. In your opinion, is this better or worse in terms of telling a story? What are the advantages/disadvantages of each?
   
 ```{r}
-
+Trips %>% 
+  mutate(day = wday(sdate, label = TRUE), 
+         time = hour(sdate) + minute(sdate)/60) %>% 
+  ggplot(aes(x = time)) +
+  geom_density(aes(fill = client), alpha = 0.5, position = position_stack()) + 
+  facet_wrap(~day) +
+  labs(x = "Time of Day", y = "Density of Bike Rentals", fill = "Client")
 ```
+  
+\
+
+I think this effect is better than the default because the curves are "stacked" which allows for easier visual comparison, much like looking at bar graphs stacked on top of each other when the positions are flipped. However, it does seem like the scaling is adjusted and might make comparisons less accurate.  
   
   13. In this graph, go back to using the regular density plot (without `position = position_stack()`). Add a new variable to the dataset called `weekend` which will be "weekend" if the day is Saturday or Sunday and  "weekday" otherwise (HINT: use the `ifelse()` function and the `wday()` function from `lubridate`). Then, update the graph from the previous problem by faceting on the new `weekend` variable. 
   
