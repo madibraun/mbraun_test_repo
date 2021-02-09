@@ -112,7 +112,7 @@ left_join(garden_2, garden_planting)
 
 \
 
-There is some missing data in `garden_2` in the *asparagus* row and missing data in `garden_planting` in the *strawberry* row. There are also rows for varieties in each data frame that don't exist in the other, such as *greens* in `garden_planting`. Some data cleaning would have to be done to fix this, such as adding missing rows to each or just getting rid of all rows that have columns containing *NA*.
+There is some missing data in `garden_2` in the *asparagus* row and missing data in `garden_planting` in the *strawberry* row. There are also rows for varieties in each data frame that don't exist in the other, such as *greens* in `garden_planting` or more than one entry for *radish* in `garden_planting` so we don't know which plots the radishes were picked from. We can widen or lengthen the data sets to find common columns to join by that won't remove these variables.
 
 
   3. I would like to understand how much money I "saved" by gardening, for each vegetable type. Describe how I could use the `garden_harvest` and `garden_spending` datasets, along with data from somewhere like [this](https://products.wholefoodsmarket.com/search?sort=relevance&store=10542) to answer this question. You can answer this in words, referencing various join functions. You don't need R code but could provide some if it's helpful.
@@ -336,8 +336,14 @@ This graph looks *almost* the same as the previous graph. When comparing client 
   
 
 ```r
-ggplot(Stations, aes(x = long, y = lat)) +
-  geom_point(aes(color = nbEmptyDocks), alpha = 0.5) +
+trips_stations <- Trips %>% 
+  group_by(sstation) %>% 
+  summarize(num_dep = n()) %>% 
+  rename(name = sstation)
+
+left_join(trips_stations, Stations) %>% 
+  ggplot(aes(x = long, y = lat)) + 
+  geom_point(aes(color = num_dep), alpha = 0.5) +
   labs(x = "Longitude", y = "Latitude", color = "Number of Departures")
 ```
 
